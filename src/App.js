@@ -1,23 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
-
+import "./App.css";
+import React from "react";
+import fetchData from "./servises/api";
+import { useState, useEffect } from "react";
+import MainPage from "./pages/MainPage";
 function App() {
+  const [coins, setCoins] = useState(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const result = await fetchData();
+        setCoins(result);
+      } catch {
+        setError(!error);
+      }
+    }
+
+    getData();
+  }, []);
+  console.log(coins);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <MainPage coins={coins} />
     </div>
   );
 }
