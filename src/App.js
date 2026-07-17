@@ -1,11 +1,12 @@
 import "./App.css";
 import React from "react";
-import fetchData from "./servises/api";
+import { fetchData, fetchTrendingCryptos } from "./servises/api";
 import { useState, useEffect } from "react";
 import MainPage from "./pages/MainPage";
 function App() {
   const [coins, setCoins] = useState(null);
   const [error, setError] = useState(false);
+  const [trendingCoins, setTrendingCoins] = useState(null);
 
   useEffect(() => {
     async function getData() {
@@ -19,11 +20,22 @@ function App() {
 
     getData();
   }, []);
-  console.log(coins);
+  useEffect(() => {
+    async function getTrendingCryptos() {
+      try {
+        const result = await fetchTrendingCryptos();
+        setTrendingCoins(result);
+      } catch {
+        setError(!error);
+      }
+    }
+
+    getTrendingCryptos();
+  }, []);
 
   return (
     <div className="App">
-      <MainPage coins={coins} />
+      <MainPage coins={coins} trendingCoins={trendingCoins?.coins} />
     </div>
   );
 }
