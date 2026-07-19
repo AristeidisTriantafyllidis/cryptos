@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { LineGraph } from "../components/Chart";
 
 export default function MainPage(props) {
   const [cryptos, setCryptos] = useState([]);
@@ -39,6 +40,7 @@ export default function MainPage(props) {
     } else {
       percentageText = pricePercentageDaily.toFixed(2);
     }
+    const cryptoPrices = crypto?.sparkline_in_7d.price;
     return (
       <div key={crypto.id}>
         <p>{crypto.name}</p>
@@ -47,6 +49,9 @@ export default function MainPage(props) {
         </p>
         <p>{crypto.current_price} $</p>
         <p>{percentageText} %</p>
+        <div>
+          <LineGraph priceArray={cryptoPrices} />
+        </div>
       </div>
     );
   });
