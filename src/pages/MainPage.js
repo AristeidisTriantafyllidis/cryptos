@@ -1,10 +1,14 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { LineGraph } from "../components/Chart";
+import { useNavigate } from "react-router-dom";
 
 export default function MainPage(props) {
   const [cryptos, setCryptos] = useState([]);
   const [trendingCryptos, setTrendingCoins] = useState([]);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (props.coins) {
       setCryptos(props.coins);
@@ -13,6 +17,11 @@ export default function MainPage(props) {
       setTrendingCoins(props.trendingCoins);
     }
   }, [props.coins, props.trendingCoins]);
+
+  const handleClick = (crypto) => {
+    props.findId(crypto.id);
+    navigate("/DetailPage");
+  };
 
   let trending = trendingCryptos.map((crypto) => {
     const pricePercentageDaily = Number(
@@ -25,13 +34,13 @@ export default function MainPage(props) {
       percentageText = pricePercentageDaily.toFixed(2);
     }
     return (
-      <div key={crypto.item.coin_id}>
+      <div key={crypto.item.coin_id} onClick={() => handleClick(crypto.item)}>
         <p>{crypto.item.name}</p>
         <p>{percentageText}</p>
       </div>
     );
   });
-  console.log(cryptos);
+
   let allCryptos = cryptos.map((crypto) => {
     const pricePercentageDaily = Number(crypto?.price_change_percentage_24h);
     let percentageText = "";
@@ -42,7 +51,7 @@ export default function MainPage(props) {
     }
     const cryptoPrices = crypto?.sparkline_in_7d.price;
     return (
-      <div key={crypto.id}>
+      <div key={crypto.id} onClick={() => handleClick(crypto)}>
         <p>{crypto.name}</p>
         <p>
           <img alt="crypto logo " src={crypto.image} />

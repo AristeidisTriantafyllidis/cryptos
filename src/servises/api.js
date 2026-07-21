@@ -25,3 +25,15 @@ export async function fetchTrendingCryptos() {
   }
   return response.json();
 }
+
+export async function fetchSpecificCrypto(id) {
+  const url = `https://api.coingecko.com/api/v3/coins/${id}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { "x-cg-demo-api-key": "CG-4BmZ36BqvWyusNZayyXcVQHL" },
+  });
+  if (!response.ok) {
+    throw new Error(`Response Status : ${response.status}`);
+  }
+  return response.json();
+}

@@ -1,51 +1,24 @@
-import React from "react";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-);
+import React, { useEffect, useRef } from "react";
+import { createChart, AreaSeries } from "lightweight-charts";
 
 export const LineGraph = ({ priceArray }) => {
-  const chartData = {
-    labels: priceArray ? new Array(priceArray.length).fill("") : [],
-    datasets: [
-      {
-        label: "Price of 7 d",
-        data: priceArray,
-        borderColor: "rgb(21, 109, 109)",
-        tension: 0.2,
-        pointRadius: 0,
-      },
-    ],
-  };
+  const chartContainerRef = useRef(null);
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: { display: false },
-      y: { display: true },
-    },
-    plugins: {
-      legend: { display: true },
-    },
-  };
+  useEffect(() => {
+    const chart = createChart(chartContainerRef.current, {
+      width: 600,
+      height: 400,
+    });
 
-  return <Line options={options} data={chartData} />;
+    const areaSeries = chart.addSeries(AreaSeries);
+
+    const formattedData = priceArray.map((price, index) => ({
+      time: index,
+      value: price,
+    }));
+
+    areaSeries.setData(formattedData);
+  }, [priceArray]);
+
+  return <div ref={chartContainerRef} />;
 };
