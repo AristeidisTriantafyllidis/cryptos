@@ -1,4 +1,5 @@
 import React from "react";
+import Header from "./Header";
 import { useState, useEffect } from "react";
 import { LineGraph } from "../components/Chart";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +23,19 @@ export default function MainPage(props) {
     props.findId(crypto.id);
     navigate("/DetailPage");
   };
+  const formatPrice = (price) => {
+    return (price = new Intl.NumberFormat("en-us", {
+      style: "currency",
+      currency: "USD",
+      notation: "compact",
+      compactDisplay: "short",
+      maximumFractionDigits: 1,
+    }).format(price));
+  };
 
   let trending = trendingCryptos.map((crypto) => {
     const pricePercentageDaily = Number(
-      crypto.item.data.price_change_percentage_24h.eur,
+      crypto.item.data.price_change_percentage_24h.usd,
     );
     let percentageText = "";
     if (pricePercentageDaily > 0) {
@@ -33,6 +43,7 @@ export default function MainPage(props) {
     } else {
       percentageText = pricePercentageDaily.toFixed(2);
     }
+
     return (
       <div key={crypto.item.coin_id} onClick={() => handleClick(crypto.item)}>
         <p>{crypto.item.name}</p>
@@ -50,13 +61,14 @@ export default function MainPage(props) {
       percentageText = pricePercentageDaily.toFixed(2);
     }
     const cryptoPrices = crypto?.sparkline_in_7d.price;
+    const formatCryptoPrice = formatPrice(crypto?.current_price);
     return (
       <div key={crypto.id} onClick={() => handleClick(crypto)}>
         <p>{crypto.name}</p>
         <p>
           <img alt="crypto logo " src={crypto.image} />
         </p>
-        <p>{crypto.current_price} $</p>
+        <p>{formatCryptoPrice} $</p>
         <p>{percentageText} %</p>
         <div>
           <LineGraph priceArray={cryptoPrices} />
@@ -66,6 +78,7 @@ export default function MainPage(props) {
   });
   return (
     <div>
+      <Header />
       <p>trending 🔥</p>
       {trending}
       {allCryptos}
