@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import MainPage from "./pages/MainPage";
 import DetailPage from "./pages/DetailPage";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { color } from "chart.js/helpers";
 
 function App() {
   const [coins, setCoins] = useState(null);
@@ -16,6 +17,7 @@ function App() {
   const [trendingCoins, setTrendingCoins] = useState(null);
   const [specificCoin, setSpecificCoin] = useState(null);
   const [id, SetId] = useState(null);
+  const [backgroundColor, setBackgroundColor] = useState("white");
 
   useEffect(() => {
     async function getData() {
@@ -65,8 +67,20 @@ function App() {
     SetId(id);
   };
 
+  let background = {};
+  if (backgroundColor === "white") {
+    background = {
+      backgroundColor: "white",
+      color: "black",
+    };
+  } else {
+    background = {
+      backgroundColor: "black",
+      color: "white",
+    };
+  }
   return (
-    <div className="App">
+    <div className="App" style={background}>
       <BrowserRouter>
         <Routes>
           <Route
@@ -76,12 +90,20 @@ function App() {
                 coins={coins}
                 trendingCoins={trendingCoins?.coins}
                 findId={findId}
+                backgroundColor={backgroundColor}
+                setBackgroundColor={setBackgroundColor}
               />
             }
           />
           <Route
             path="/DetailPage"
-            element={<DetailPage specificCoin={specificCoin} />}
+            element={
+              <DetailPage
+                specificCoin={specificCoin}
+                backgroundColor={backgroundColor}
+                setBackgroundColor={setBackgroundColor}
+              />
+            }
           />
         </Routes>
       </BrowserRouter>

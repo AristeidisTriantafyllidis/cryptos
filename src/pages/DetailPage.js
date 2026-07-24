@@ -26,7 +26,7 @@ export default function DetailPage(props) {
       currency: "USD",
       notation: "compact",
       compactDisplay: "short",
-      maximumFractionDigits: 1,
+      maximumFractionDigits: 2,
     }).format(price));
   };
   const formatNumber = (number) => {
@@ -35,20 +35,30 @@ export default function DetailPage(props) {
       compactDisplay: "short",
     }).format(number));
   };
-  const marketCap = coin?.market_data.market_cap.usd;
-  const formatMarketCap = formatCryptoPrice(marketCap);
-  const dailyVolume = coin?.market_data.total_volume.usd;
-  const formatDailyVolume = formatCryptoPrice(dailyVolume);
-  const circulatingSupply = coin?.market_data.circulating_supply;
-  const formatCirculatingSupply = formatNumber(circulatingSupply);
-  const allTimeHigh = coin?.market_data.ath.usd;
-  const formatAllTimeHigh = formatCryptoPrice(allTimeHigh);
-  const allTimeLow = coin?.market_data.atl.usd;
-  const formatAllTimeLow = formatCryptoPrice(allTimeLow);
+  const formatPrice = (number) => {
+    return new Intl.NumberFormat("en-US").format(number);
+  };
 
+  const marketCap = formatCryptoPrice(coin?.market_data.market_cap.usd);
+  const dailyVolume = formatCryptoPrice(coin?.market_data.total_volume.usd);
+  const circulatingSupply = formatNumber(coin?.market_data.circulating_supply);
+  const allTimeHigh = formatCryptoPrice(coin?.market_data.ath.usd);
+  const allTimeLow = formatCryptoPrice(coin?.market_data.atl.usd);
+  const dateAth = coin?.market_data.ath_date.usd.split("T");
+  const formatDateAth = dateAth
+    ? dateAth[0]?.split("-").reverse().join("-")
+    : "";
+  const dateAtl = coin?.market_data.atl_date.usd.split("T");
+  const formatDateAtl = dateAtl
+    ? dateAtl[0]?.split("-").reverse().join("-")
+    : "";
+  const accuratePrice = formatPrice(coin?.market_data.current_price.usd);
   return (
     <div>
-      <Header />
+      <Header
+        backgroundColor={props.backgroundColor}
+        setBackgroundColor={props.setBackgroundColor}
+      />
       <div>
         <button onClick={() => navigate("/")}>Go back</button>
       </div>
@@ -59,21 +69,20 @@ export default function DetailPage(props) {
         <p>{coin?.name}</p>
         <p>{coin?.symbol}</p>
         <p>Rank #{coin?.market_cap_rank} </p>
-        <p> {coin?.market_data.current_price.usd}</p>
+        <p> {accuratePrice} $</p>
         <p>{percentageText}% (24h)</p>
         <div>
           <h2>Market Stats</h2>
-          <p>Market Cap {formatMarketCap} </p>
-          <p>24h Volume {formatDailyVolume}</p>
+          <p>Market Cap {marketCap} </p>
+          <p>24h Volume {dailyVolume}</p>
           <p>
-            Circulating Supply {formatCirculatingSupply} {coin?.symbol}
+            Circulating Supply {circulatingSupply} {coin?.symbol}
           </p>
           <p>
-            All time High {formatAllTimeHigh}{" "}
-            {coin?.market_data.ath_date.usd}{" "}
+            All time High : {allTimeHigh} AT ({formatDateAth})
           </p>
           <p>
-            All time Low {formatAllTimeLow} {coin?.market_data.atl_date.usd}
+            All time Low : {allTimeLow} AT : ({formatDateAtl})
           </p>
         </div>
       </div>

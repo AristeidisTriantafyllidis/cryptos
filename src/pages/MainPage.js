@@ -68,7 +68,7 @@ export default function MainPage(props) {
         <p>
           <img alt="crypto logo " src={crypto.image} />
         </p>
-        <p>{formatCryptoPrice} $</p>
+        <p>{formatCryptoPrice} </p>
         <p>{percentageText} %</p>
         <div>
           <LineGraph priceArray={cryptoPrices} />
@@ -78,7 +78,10 @@ export default function MainPage(props) {
   });
   return (
     <div>
-      <Header />
+      <Header
+        backgroundColor={props.backgroundColor}
+        setBackgroundColor={props.setBackgroundColor}
+      />
       <p>trending 🔥</p>
       {trending}
       {allCryptos}

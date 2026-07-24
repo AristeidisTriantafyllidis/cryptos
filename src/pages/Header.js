@@ -1,6 +1,7 @@
-import React from "react";
+import React, { startTransition } from "react";
 import { useNavigate } from "react-router-dom";
-export default function Header() {
+
+export default function Header(props) {
   const navigate = useNavigate();
   return (
     <div>
@@ -8,7 +9,8 @@ export default function Header() {
       <button onClick={() => navigate("/")}>
         <img style={{ width: "100px" }} src="./logoImage.png" />
       </button>
-      <p>[🌙/☀️] </p>
+      [ <button onClick={() => props.setBackgroundColor("black")}>🌙</button> /
+      <button onClick={() => props.setBackgroundColor("white")}>☀️</button>]
     </div>
   );
 }
