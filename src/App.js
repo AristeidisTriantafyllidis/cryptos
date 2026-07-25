@@ -4,12 +4,12 @@ import {
   fetchData,
   fetchTrendingCryptos,
   fetchSpecificCrypto,
+  fetchDataForCHart,
 } from "./servises/api";
 import { useState, useEffect } from "react";
 import MainPage from "./pages/MainPage";
 import DetailPage from "./pages/DetailPage";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { color } from "chart.js/helpers";
 
 function App() {
   const [coins, setCoins] = useState(null);
@@ -18,7 +18,8 @@ function App() {
   const [specificCoin, setSpecificCoin] = useState(null);
   const [id, SetId] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState("white");
-
+  const [chartData, setChartData] = useState(null);
+  const [daysForChart, setDaysForChart] = useState(1);
   useEffect(() => {
     async function getData() {
       try {
@@ -55,13 +56,25 @@ function App() {
           setError(!error);
         }
       }
+
       getSpecificCrypto(id);
     }
-    return function () {
-      SetId(null);
-      setSpecificCoin(null);
-    };
   }, [id]);
+
+  useEffect(() => {
+    if (id !== null) {
+      async function getDataforChart(id, days) {
+        try {
+          const result = await fetchDataForCHart(id, days);
+          setChartData(result);
+        } catch (error) {
+          setError(!error);
+        }
+      }
+
+      getDataforChart(id, daysForChart);
+    }
+  }, [id, daysForChart]);
 
   const findId = (id) => {
     SetId(id);
@@ -79,6 +92,7 @@ function App() {
       color: "white",
     };
   }
+  console.log(daysForChart);
   return (
     <div className="App" style={background}>
       <BrowserRouter>
@@ -102,6 +116,9 @@ function App() {
                 specificCoin={specificCoin}
                 backgroundColor={backgroundColor}
                 setBackgroundColor={setBackgroundColor}
+                chartData={chartData}
+                daysForChart={daysForChart}
+                setDaysForChart={setDaysForChart}
               />
             }
           />

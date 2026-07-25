@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
+import { LineGraph } from "../components/Chart";
+
 export default function DetailPage(props) {
   const [coin, setCoin] = useState(null);
+  const [chartData, setChartData] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (props.specificCoin) {
+    if (props.specificCoin && props.chartData) {
       setCoin(props.specificCoin);
     }
-  }, [props.specificCoin]);
+    if (props.chartData?.prices) {
+      setChartData(props.chartData.prices);
+    }
+  }, [props.specificCoin, props.chartData]);
 
   const pricePercentageDaily =
     coin?.market_data.market_cap_change_percentage_24h;
@@ -85,6 +91,13 @@ export default function DetailPage(props) {
             All time Low : {allTimeLow} AT : ({formatDateAtl})
           </p>
         </div>
+      </div>
+      <div>
+        <div>{/* <LineGraph priceArray={chartData} /> */}</div>
+        <button onClick={() => props.setDaysForChart(1)}>1d</button>
+        <button onClick={() => props.setDaysForChart(7)}>7d</button>
+        <button onClick={() => props.setDaysForChart(30)}>30d</button>
+        <button onClick={() => props.setDaysForChart(365)}>1Y</button>
       </div>
       <div>
         <h2> About {coin?.name}</h2>
