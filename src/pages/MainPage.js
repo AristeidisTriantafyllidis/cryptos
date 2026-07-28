@@ -5,19 +5,23 @@ import { LineGraph } from "../components/Chart";
 import { useNavigate } from "react-router-dom";
 
 export default function MainPage(props) {
-  const [cryptos, setCryptos] = useState([]);
+  const [top20Cryptos, setTop20Cryptos] = useState([]);
   const [trendingCryptos, setTrendingCoins] = useState([]);
-
+  const [allCryptos, setAllCryptos] = useState([]);
+  const [searchCrypto, setSearchCrypto] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     if (props.coins) {
-      setCryptos(props.coins);
+      setTop20Cryptos(props.coins);
     }
     if (props.trendingCoins) {
       setTrendingCoins(props.trendingCoins);
     }
-  }, [props.coins, props.trendingCoins]);
+    if (props.allCoins) {
+      setAllCryptos(props.allCoins);
+    }
+  }, [props.coins, props.trendingCoins, props.allCoins]);
 
   const handleClick = (crypto) => {
     props.findId(crypto.id);
@@ -52,7 +56,7 @@ export default function MainPage(props) {
     );
   });
 
-  let allCryptos = cryptos.map((crypto) => {
+  let topCryptos = top20Cryptos.map((crypto) => {
     const pricePercentageDaily = Number(crypto?.price_change_percentage_24h);
     let percentageText = "";
     if (pricePercentageDaily > 0) {
@@ -76,15 +80,18 @@ export default function MainPage(props) {
       </div>
     );
   });
+
   return (
     <div>
       <Header
         backgroundColor={props.backgroundColor}
         setBackgroundColor={props.setBackgroundColor}
+        searchCrypto={searchCrypto}
+        setSearchCrypto={setSearchCrypto}
       />
       <p>trending 🔥</p>
       {trending}
-      {allCryptos}
+      {topCryptos}
     </div>
   );
 }

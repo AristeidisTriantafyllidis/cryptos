@@ -18,6 +18,10 @@ export const LineGraph = ({ priceArray }) => {
     }));
 
     areaSeries.setData(formattedData);
+
+    return () => {
+      chart.remove();
+    };
   }, [priceArray]);
 
   return <div ref={chartContainerRef} />;

@@ -49,3 +49,15 @@ export async function fetchDataForCHart(id, days) {
   }
   return response.json();
 }
+
+export async function fetchEveryCoin() {
+  const url = "https://api.coingecko.com/api/v3/coins/list";
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { "x-cg-demo-api-key": "CG-4BmZ36BqvWyusNZayyXcVQHL" },
+  });
+  if (!response.ok) {
+    throw new Error(`Response status ${response.status}`);
+  }
+  return response.json();
+}

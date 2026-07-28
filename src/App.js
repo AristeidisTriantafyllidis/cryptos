@@ -5,6 +5,7 @@ import {
   fetchTrendingCryptos,
   fetchSpecificCrypto,
   fetchDataForCHart,
+  fetchEveryCoin,
 } from "./servises/api";
 import { useState, useEffect } from "react";
 import MainPage from "./pages/MainPage";
@@ -17,9 +18,13 @@ function App() {
   const [trendingCoins, setTrendingCoins] = useState(null);
   const [specificCoin, setSpecificCoin] = useState(null);
   const [id, SetId] = useState(null);
-  const [backgroundColor, setBackgroundColor] = useState("white");
   const [chartData, setChartData] = useState(null);
   const [daysForChart, setDaysForChart] = useState(1);
+  const [backgroundColor, setBackgroundColor] = useState(() => {
+    return localStorage.getItem("backgroundColor") || "white";
+  });
+  const [allCoins, setAllCoins] = useState(null);
+
   useEffect(() => {
     async function getData() {
       try {
@@ -29,11 +34,6 @@ function App() {
         setError(!error);
       }
     }
-
-    getData();
-  }, []);
-
-  useEffect(() => {
     async function getTrendingCryptos() {
       try {
         const result = await fetchTrendingCryptos();
@@ -42,8 +42,18 @@ function App() {
         setError(!error);
       }
     }
+    async function getAllCoins() {
+      try {
+        const result = await fetchEveryCoin();
+        setAllCoins(result);
+      } catch (error) {
+        setError(!error);
+      }
+    }
 
     getTrendingCryptos();
+    getData();
+    getAllCoins();
   }, []);
 
   useEffect(() => {
@@ -76,6 +86,10 @@ function App() {
     }
   }, [id, daysForChart]);
 
+  useEffect(() => {
+    localStorage.setItem("backgroundColor", backgroundColor);
+  }, [backgroundColor]);
+
   const findId = (id) => {
     SetId(id);
   };
@@ -92,7 +106,7 @@ function App() {
       color: "white",
     };
   }
-  console.log(daysForChart);
+
   return (
     <div className="App" style={background}>
       <BrowserRouter>
@@ -103,6 +117,7 @@ function App() {
               <MainPage
                 coins={coins}
                 trendingCoins={trendingCoins?.coins}
+                allCoins={allCoins}
                 findId={findId}
                 backgroundColor={backgroundColor}
                 setBackgroundColor={setBackgroundColor}

@@ -5,7 +5,7 @@ import { LineGraph } from "../components/Chart";
 
 export default function DetailPage(props) {
   const [coin, setCoin] = useState(null);
-  const [chartData, setChartData] = useState(null);
+  const [chartData, setChartData] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function DetailPage(props) {
       setCoin(props.specificCoin);
     }
     if (props.chartData?.prices) {
-      setChartData(props.chartData.prices);
+      setChartData(props.chartData.prices.map((item) => item[1]));
     }
   }, [props.specificCoin, props.chartData]);
 
@@ -42,7 +42,9 @@ export default function DetailPage(props) {
     }).format(number));
   };
   const formatPrice = (number) => {
-    return new Intl.NumberFormat("en-US").format(number);
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 7,
+    }).format(number);
   };
 
   const marketCap = formatCryptoPrice(coin?.market_data.market_cap.usd);
@@ -85,15 +87,17 @@ export default function DetailPage(props) {
             Circulating Supply {circulatingSupply} {coin?.symbol}
           </p>
           <p>
-            All time High : {allTimeHigh} AT ({formatDateAth})
+            All time High : {allTimeHigh} AT {formatDateAth}
           </p>
           <p>
-            All time Low : {allTimeLow} AT : ({formatDateAtl})
+            All time Low : {allTimeLow} AT : {formatDateAtl}
           </p>
         </div>
       </div>
       <div>
-        <div>{/* <LineGraph priceArray={chartData} /> */}</div>
+        <div>
+          <LineGraph priceArray={chartData} />
+        </div>
         <button onClick={() => props.setDaysForChart(1)}>1d</button>
         <button onClick={() => props.setDaysForChart(7)}>7d</button>
         <button onClick={() => props.setDaysForChart(30)}>30d</button>
