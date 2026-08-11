@@ -10,6 +10,7 @@ import {
 import { useState, useEffect } from "react";
 import MainPage from "./pages/MainPage";
 import DetailPage from "./pages/DetailPage";
+import Watchlist from "./pages/Watchlist";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
     return localStorage.getItem("backgroundColor") || "white";
   });
   const [allCoins, setAllCoins] = useState(null);
+  const [watchlistData, setWatchlistData] = useState([]);
 
   useEffect(() => {
     async function getData() {
@@ -107,6 +109,9 @@ function App() {
     };
   }
 
+  const handleAddtoWatchlist = (crypto) => {
+    setWatchlistData((previusWatchList) => [...previusWatchList, crypto]);
+  };
   return (
     <div className="App" style={background}>
       <BrowserRouter>
@@ -134,7 +139,16 @@ function App() {
                 chartData={chartData}
                 daysForChart={daysForChart}
                 setDaysForChart={setDaysForChart}
+                watchlistData={watchlistData}
+                setWatchlistData={setWatchlistData}
+                handleAddtoWatchlist={handleAddtoWatchlist}
               />
+            }
+          />
+          <Route
+            path="/Watchlist"
+            element={
+              <Watchlist watchlistData={watchlistData} findId={findId} />
             }
           />
         </Routes>

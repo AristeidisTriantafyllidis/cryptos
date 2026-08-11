@@ -61,6 +61,7 @@ export default function DetailPage(props) {
     ? dateAtl[0]?.split("-").reverse().join("-")
     : "";
   const accuratePrice = formatPrice(coin?.market_data.current_price.usd);
+
   return (
     <div>
       <Header
@@ -69,6 +70,25 @@ export default function DetailPage(props) {
       />
       <div>
         <button onClick={() => navigate("/")}>Go back</button>
+      </div>
+      <div style={{ marginTop: "50px" }}>
+        <button
+          disabled={!coin}
+          onClick={() => {
+            if (coin) {
+              props.handleAddtoWatchlist({
+                id: coin.id,
+                name: coin.name,
+                image: coin.image?.small,
+                price: coin.market_data?.current_price?.usd,
+                percentage24h:
+                  coin.market_data?.market_cap_change_percentage_24h,
+              });
+            }
+          }}
+        >
+          Add this coin to watchlist
+        </button>
       </div>
       <div>
         <p>

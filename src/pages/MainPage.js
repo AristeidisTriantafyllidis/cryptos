@@ -37,7 +37,7 @@ export default function MainPage(props) {
     }).format(price));
   };
 
-  let trending = trendingCryptos.map((crypto) => {
+  const trending = trendingCryptos.map((crypto) => {
     const pricePercentageDaily = Number(
       crypto.item.data.price_change_percentage_24h.usd,
     );
@@ -55,7 +55,7 @@ export default function MainPage(props) {
       </div>
     );
   });
-
+  <div></div>;
   let topCryptos = top20Cryptos.map((crypto) => {
     const pricePercentageDaily = Number(crypto?.price_change_percentage_24h);
     let percentageText = "";
@@ -81,6 +81,33 @@ export default function MainPage(props) {
     );
   });
 
+  const filteredCryptos = allCryptos.filter((crypto) =>
+    crypto.name.toLowerCase().startsWith(searchCrypto.toLowerCase()),
+  );
+
+  let searchPage;
+
+  if (searchCrypto !== "") {
+    if (filteredCryptos.length > 0) {
+      searchPage = filteredCryptos.map((crypto) => {
+        return (
+          <div
+            key={crypto.id || crypto.name}
+            onClick={() => handleClick(crypto)}
+          >
+            <p>{crypto.name}</p>
+          </div>
+        );
+      });
+    } else {
+      searchPage = (
+        <div className="empty-state">
+          <p>No crypto found</p>
+        </div>
+      );
+    }
+  }
+
   return (
     <div>
       <Header
@@ -89,9 +116,16 @@ export default function MainPage(props) {
         searchCrypto={searchCrypto}
         setSearchCrypto={setSearchCrypto}
       />
-      <p>trending 🔥</p>
-      {trending}
-      {topCryptos}
+
+      {searchCrypto === "" ? (
+        <div>
+          <p>trending 🔥</p>
+          {trending}
+          {topCryptos}
+        </div>
+      ) : (
+        searchPage
+      )}
     </div>
   );
 }

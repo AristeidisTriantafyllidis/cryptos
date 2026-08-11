@@ -21,6 +21,7 @@ export default function Header(props) {
         value={props.searchCrypto}
         onChange={handleChange}
       ></input>
+      <button onClick={() => navigate("/Watchlist")}>Go to watchlist</button>
     </div>
   );
 }
