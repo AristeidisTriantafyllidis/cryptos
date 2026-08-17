@@ -142,6 +142,8 @@ function App() {
                 watchlistData={watchlistData}
                 setWatchlistData={setWatchlistData}
                 handleAddtoWatchlist={handleAddtoWatchlist}
+                allCoins={allCoins}
+                findId={findId}
               />
             }
           />
