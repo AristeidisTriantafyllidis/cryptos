@@ -108,10 +108,16 @@ function App() {
       color: "white",
     };
   }
-
   const handleAddtoWatchlist = (crypto) => {
-    setWatchlistData((previusWatchList) => [...previusWatchList, crypto]);
+    for (const item of watchlistData) {
+      if (item.id === crypto.id) {
+        alert("This coin already exists in your Watchlist!");
+        return;
+      }
+    }
+    setWatchlistData((prev) => [...prev, crypto]);
   };
+
   return (
     <div className="App" style={background}>
       <BrowserRouter>
@@ -150,7 +156,13 @@ function App() {
           <Route
             path="/Watchlist"
             element={
-              <Watchlist watchlistData={watchlistData} findId={findId} />
+              <Watchlist
+                watchlistData={watchlistData}
+                findId={findId}
+                allCoins={allCoins}
+                backgroundColor={backgroundColor}
+                setBackgroundColor={setBackgroundColor}
+              />
             }
           />
         </Routes>

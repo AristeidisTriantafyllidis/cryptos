@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-import { LineGraph } from "../components/Chart";
+import { LineGraph } from "../chrart/Chart";
 
 export default function DetailPage(props) {
   const [coin, setCoin] = useState(null);
@@ -52,20 +52,20 @@ export default function DetailPage(props) {
     }).format(number);
   };
 
-  const marketCap = formatCryptoPrice(coin?.market_data.market_cap.usd);
-  const dailyVolume = formatCryptoPrice(coin?.market_data.total_volume.usd);
-  const circulatingSupply = formatNumber(coin?.market_data.circulating_supply);
-  const allTimeHigh = formatCryptoPrice(coin?.market_data.ath.usd);
-  const allTimeLow = formatCryptoPrice(coin?.market_data.atl.usd);
-  const dateAth = coin?.market_data.ath_date.usd.split("T");
+  const marketCap = formatCryptoPrice(coin?.market_data.market_cap?.usd);
+  const dailyVolume = formatCryptoPrice(coin?.market_data.total_volume?.usd);
+  const circulatingSupply = formatNumber(coin?.market_data?.circulating_supply);
+  const allTimeHigh = formatCryptoPrice(coin?.market_data?.ath?.usd);
+  const allTimeLow = formatCryptoPrice(coin?.market_data?.atl?.usd);
+  const dateAth = coin?.market_data?.ath_date?.usd?.split("T");
   const formatDateAth = dateAth
     ? dateAth[0]?.split("-").reverse().join("-")
     : "";
-  const dateAtl = coin?.market_data.atl_date.usd.split("T");
+  const dateAtl = coin?.market_data?.atl_date?.usd?.split("T");
   const formatDateAtl = dateAtl
     ? dateAtl[0]?.split("-").reverse().join("-")
     : "";
-  const accuratePrice = formatPrice(coin?.market_data.current_price.usd);
+  const accuratePrice = formatPrice(coin?.market_data?.current_price?.usd);
   const filteredCryptos = allCryptos.filter((crypto) =>
     crypto.name.toLowerCase().startsWith(searchCrypto.toLowerCase()),
   );

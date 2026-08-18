@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "./Header";
 import { useState, useEffect } from "react";
-import { LineGraph } from "../components/Chart";
+import { LineGraph } from "../chrart/Chart";
 import { useNavigate } from "react-router-dom";
 
 export default function MainPage(props) {
