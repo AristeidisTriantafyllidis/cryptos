@@ -115,7 +115,6 @@ export default function DetailPage(props) {
           </div>
           <div style={{ marginTop: "50px" }}>
             <button
-              disabled={!coin}
               onClick={() => {
                 if (coin) {
                   props.handleAddtoWatchlist({

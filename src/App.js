@@ -25,7 +25,10 @@ function App() {
     return localStorage.getItem("backgroundColor") || "white";
   });
   const [allCoins, setAllCoins] = useState(null);
-  const [watchlistData, setWatchlistData] = useState([]);
+  const [watchlistData, setWatchlistData] = useState(() => {
+    const savedWatchlist = localStorage.getItem("cryptoWatchlist");
+    return savedWatchlist ? JSON.parse(savedWatchlist) : [];
+  });
 
   useEffect(() => {
     async function getData() {
@@ -91,6 +94,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem("backgroundColor", backgroundColor);
   }, [backgroundColor]);
+
+  useEffect(() => {
+    localStorage.setItem("cryptoWatchlist", JSON.stringify(watchlistData));
+  }, [watchlistData]);
 
   const findId = (id) => {
     SetId(id);
@@ -162,6 +169,7 @@ function App() {
                 allCoins={allCoins}
                 backgroundColor={backgroundColor}
                 setBackgroundColor={setBackgroundColor}
+                setWatchlistData={setWatchlistData}
               />
             }
           />

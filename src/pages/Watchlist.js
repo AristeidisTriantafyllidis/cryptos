@@ -21,6 +21,13 @@ export default function Watchlist(props) {
   const filteredCryptos = allCryptos.filter((crypto) =>
     crypto.name.toLowerCase().startsWith(searchCrypto.toLowerCase()),
   );
+  const deleteCryptoFromWatchlist = (e, cryptoId) => {
+    e.stopPropagation();
+    const updateWatchlist = props?.watchlistData?.filter(
+      (crypto) => crypto.id !== cryptoId,
+    );
+    props.setWatchlistData(updateWatchlist);
+  };
 
   let searchPage;
 
@@ -50,11 +57,14 @@ export default function Watchlist(props) {
         <p>{crypto?.name}</p>
         <img src={crypto.image} />
         <p>Current price {crypto.price}</p>
-        <p> Daily percentagee:{crypto.percentage24h} %</p>
+        <p> Daily percentagee: {crypto.percentage24h} %</p>
+        <button onClick={(e) => deleteCryptoFromWatchlist(e, crypto.id)}>
+          Delete from Watchlist
+        </button>
       </div>
     );
   });
-
+  console.log(props?.watchlistData);
   return (
     <div>
       <Header
@@ -62,6 +72,9 @@ export default function Watchlist(props) {
         setSearchCrypto={setSearchCrypto}
         setBackgroundColor={props.setBackgroundColor}
       />
+      <button style={{ marginTop: "20px" }} onClick={() => navigate("/")}>
+        Go to home page
+      </button>
       {searchCrypto !== "" ? searchPage : watchlistPage}
     </div>
   );
