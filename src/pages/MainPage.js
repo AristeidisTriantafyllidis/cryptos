@@ -55,7 +55,7 @@ export default function MainPage(props) {
       </div>
     );
   });
-  <div></div>;
+
   let topCryptos = top20Cryptos.map((crypto) => {
     const pricePercentageDaily = Number(crypto?.price_change_percentage_24h);
     let percentageText = "";
@@ -72,8 +72,8 @@ export default function MainPage(props) {
         <p>
           <img alt="crypto logo " src={crypto.image} />
         </p>
-        <p>{formatCryptoPrice} </p>
-        <p>{percentageText} %</p>
+        <p>Price : {formatCryptoPrice} </p>
+        <p>Daily percentage: {percentageText} %</p>
         <div>
           <LineGraph priceArray={cryptoPrices} />
         </div>

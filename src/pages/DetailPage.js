@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-import { LineGraph } from "../chrart/Chart";
+import { LineGraphForDetailPage } from "../chrart/Chart";
 
 export default function DetailPage(props) {
   const [coin, setCoin] = useState(null);
@@ -157,7 +157,10 @@ export default function DetailPage(props) {
           </div>
           <div>
             <div>
-              <LineGraph priceArray={chartData} />
+              <LineGraphForDetailPage
+                priceArray={chartData}
+                days={props.daysForChart}
+              />
             </div>
             <button onClick={() => props.setDaysForChart(1)}>1d</button>
             <button onClick={() => props.setDaysForChart(7)}>7d</button>

@@ -64,7 +64,7 @@ export default function Watchlist(props) {
       </div>
     );
   });
-  console.log(props?.watchlistData);
+
   return (
     <div>
       <Header
