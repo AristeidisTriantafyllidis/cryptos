@@ -12,9 +12,14 @@ import MainPage from "./pages/MainPage";
 import DetailPage from "./pages/DetailPage";
 import Watchlist from "./pages/Watchlist";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import SkeletonPlaceholder from "./pages/skeletons/SkeletonMain";
+import DetailSkeletonPlaceholder from "./pages/skeletons/SkeletonDetail";
+import "react-loading-skeleton/dist/skeleton.css";
 
 function App() {
   const [coins, setCoins] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [detailLoading, setDetailLoading] = useState(true);
   const [error, setError] = useState(false);
   const [trendingCoins, setTrendingCoins] = useState(null);
   const [specificCoin, setSpecificCoin] = useState(null);
@@ -33,61 +38,59 @@ function App() {
   useEffect(() => {
     async function getData() {
       try {
-        const result = await fetchData();
-        setCoins(result);
+        const [coins, trending, allCoins] = await Promise.all([
+          fetchData(),
+          fetchTrendingCryptos(),
+          fetchEveryCoin(),
+        ]);
+
+        setCoins(coins);
+        setTrendingCoins(trending);
+        setAllCoins(allCoins);
       } catch (error) {
-        setError(!error);
-      }
-    }
-    async function getTrendingCryptos() {
-      try {
-        const result = await fetchTrendingCryptos();
-        setTrendingCoins(result);
-      } catch (error) {
-        setError(!error);
-      }
-    }
-    async function getAllCoins() {
-      try {
-        const result = await fetchEveryCoin();
-        setAllCoins(result);
-      } catch (error) {
-        setError(!error);
+        setError(true);
+      } finally {
+        setLoading(false);
       }
     }
 
-    getTrendingCryptos();
     getData();
-    getAllCoins();
   }, []);
 
   useEffect(() => {
     if (id !== null) {
-      async function getSpecificCrypto(id) {
+      async function getSpecificCrypto() {
+        setDetailLoading(true);
+        setSpecificCoin(null);
+        setChartData(null);
+
         try {
           const result = await fetchSpecificCrypto(id);
           setSpecificCoin(result);
         } catch (error) {
-          setError(!error);
+          setError(true);
+        } finally {
+          setDetailLoading(false);
         }
       }
 
-      getSpecificCrypto(id);
+      getSpecificCrypto();
     }
   }, [id]);
-
   useEffect(() => {
     if (id !== null) {
-      async function getDataforChart(id, days) {
+      setChartData(null);
+
+      async function getChartData() {
         try {
-          const result = await fetchDataForCHart(id, days);
+          const result = await fetchDataForCHart(id, daysForChart);
           setChartData(result);
         } catch (error) {
-          setError(!error);
+          setError(true);
         }
       }
 
-      getDataforChart(id, daysForChart);
+      getChartData();
     }
   }, [id, daysForChart]);
 
@@ -132,32 +135,40 @@ function App() {
           <Route
             path="/"
             element={
-              <MainPage
-                coins={coins}
-                trendingCoins={trendingCoins?.coins}
-                allCoins={allCoins}
-                findId={findId}
-                backgroundColor={backgroundColor}
-                setBackgroundColor={setBackgroundColor}
-              />
+              loading ? (
+                <SkeletonPlaceholder />
+              ) : (
+                <MainPage
+                  coins={coins}
+                  trendingCoins={trendingCoins?.coins}
+                  allCoins={allCoins}
+                  findId={findId}
+                  backgroundColor={backgroundColor}
+                  setBackgroundColor={setBackgroundColor}
+                />
+              )
             }
           />
           <Route
             path="/DetailPage"
             element={
-              <DetailPage
-                specificCoin={specificCoin}
-                backgroundColor={backgroundColor}
-                setBackgroundColor={setBackgroundColor}
-                chartData={chartData}
-                daysForChart={daysForChart}
-                setDaysForChart={setDaysForChart}
-                watchlistData={watchlistData}
-                setWatchlistData={setWatchlistData}
-                handleAddtoWatchlist={handleAddtoWatchlist}
-                allCoins={allCoins}
-                findId={findId}
-              />
+              detailLoading ? (
+                <DetailSkeletonPlaceholder />
+              ) : (
+                <DetailPage
+                  specificCoin={specificCoin}
+                  backgroundColor={backgroundColor}
+                  setBackgroundColor={setBackgroundColor}
+                  chartData={chartData}
+                  daysForChart={daysForChart}
+                  setDaysForChart={setDaysForChart}
+                  watchlistData={watchlistData}
+                  setWatchlistData={setWatchlistData}
+                  handleAddtoWatchlist={handleAddtoWatchlist}
+                  allCoins={allCoins}
+                  findId={findId}
+                />
+              )
             }
           />
           <Route

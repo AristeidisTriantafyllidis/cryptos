@@ -11,7 +11,7 @@ export default function DetailPage(props) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (props.specificCoin && props.chartData) {
+    if (props.specificCoin) {
       setCoin(props.specificCoin);
     }
     if (props.chartData?.prices) {
@@ -169,7 +169,11 @@ export default function DetailPage(props) {
           </div>
           <div>
             <h2> About {coin?.name}</h2>
-            <p>{coin?.description.en}</p>
+            <p>
+              {coin?.description?.en
+                ? coin.description.en
+                : "No information about this coin"}
+            </p>
           </div>
         </>
       )}
