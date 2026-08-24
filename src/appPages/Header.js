@@ -11,7 +11,7 @@ export default function Header(props) {
     <div>
       <h3>Coin Pulse</h3>
       <button onClick={() => navigate("/")}>
-        <img style={{ width: "100px" }} src="./logoImage.png" />
+        <img style={{ width: "100px" }} src="/logoImage.png" />
       </button>
       [ <button onClick={() => props.setBackgroundColor("black")}>🌙</button> /
       <button onClick={() => props.setBackgroundColor("white")}>☀️</button>]

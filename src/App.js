@@ -8,10 +8,11 @@ import {
   fetchEveryCoin,
 } from "./servises/api";
 import { useState, useEffect } from "react";
-import MainPage from "./pages/MainPage";
-import DetailPage from "./pages/DetailPage";
-import Watchlist from "./pages/Watchlist";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import MainPage from "./appPages/MainPage";
+import DetailPage from "./appPages/DetailPage";
+import Watchlist from "./appPages/Watchlist";
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SkeletonPlaceholder from "./pages/skeletons/SkeletonMain";
 import DetailSkeletonPlaceholder from "./pages/skeletons/SkeletonDetail";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -20,7 +21,7 @@ function App() {
   const [coins, setCoins] = useState(null);
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [, setError] = useState();
   const [trendingCoins, setTrendingCoins] = useState(null);
   const [specificCoin, setSpecificCoin] = useState(null);
   const [id, SetId] = useState(null);
@@ -34,6 +35,8 @@ function App() {
     const savedWatchlist = localStorage.getItem("cryptoWatchlist");
     return savedWatchlist ? JSON.parse(savedWatchlist) : [];
   });
+  const [detailError, setDetailError] = useState(null);
+  const [chartError, setChartError] = useState(null);
 
   useEffect(() => {
     async function getData() {
@@ -48,7 +51,9 @@ function App() {
         setTrendingCoins(trending);
         setAllCoins(allCoins);
       } catch (error) {
-        setError(true);
+        setError(() => {
+          throw error;
+        });
       } finally {
         setLoading(false);
       }
@@ -63,12 +68,19 @@ function App() {
         setDetailLoading(true);
         setSpecificCoin(null);
         setChartData(null);
+        setDetailError(null);
 
         try {
           const result = await fetchSpecificCrypto(id);
           setSpecificCoin(result);
         } catch (error) {
-          setError(true);
+          if (error.message.includes("429")) {
+            setDetailError("Too many requests. Please try again in a moment.");
+          } else {
+            setError(() => {
+              throw error;
+            });
+          }
         } finally {
           setDetailLoading(false);
         }
@@ -77,16 +89,24 @@ function App() {
       getSpecificCrypto();
     }
   }, [id]);
+
   useEffect(() => {
     if (id !== null) {
       setChartData(null);
+      setChartError(null);
 
       async function getChartData() {
         try {
           const result = await fetchDataForCHart(id, daysForChart);
           setChartData(result);
         } catch (error) {
-          setError(true);
+          if (error.message.includes("429")) {
+            setChartError("Too many requests. Please try again in a moment.");
+          } else {
+            setError(() => {
+              throw error;
+            });
+          }
         }
       }
 
@@ -150,7 +170,7 @@ function App() {
             }
           />
           <Route
-            path="/DetailPage"
+            path="/DetailPage/:id"
             element={
               detailLoading ? (
                 <DetailSkeletonPlaceholder />
@@ -167,6 +187,8 @@ function App() {
                   handleAddtoWatchlist={handleAddtoWatchlist}
                   allCoins={allCoins}
                   findId={findId}
+                  chartError={chartError}
+                  detailError={detailError}
                 />
               )
             }

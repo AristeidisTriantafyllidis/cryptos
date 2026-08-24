@@ -24,8 +24,9 @@ export default function MainPage(props) {
   }, [props.coins, props.trendingCoins, props.allCoins]);
 
   const handleClick = (crypto) => {
-    props.findId(crypto.id || crypto.coin_id || crypto.item?.id);
-    navigate("/DetailPage");
+    const id = crypto.id || crypto.coin_id || crypto.item?.id;
+    props.findId(id);
+    navigate(`/DetailPage/${id}`);
   };
   const formatPrice = (price) => {
     return (price = new Intl.NumberFormat("en-us", {
