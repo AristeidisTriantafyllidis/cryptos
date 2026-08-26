@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import { useNavigate } from "react-router-dom";
-
+import Watchlist from "./appPages/Watchlist";
 export default function Watchlist(props) {
   const [allCryptos, setAllCryptos] = useState([]);
   const [searchCrypto, setSearchCrypto] = useState("");
