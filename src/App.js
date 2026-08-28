@@ -1,4 +1,3 @@
-import "./App.css";
 import React from "react";
 import {
   fetchData,
@@ -8,15 +7,8 @@ import {
   fetchEveryCoin,
 } from "./servises/api";
 import { useState, useEffect } from "react";
-import MainPage from "./appPages/MainPage";
-import DetailPage from "./appPages/DetailPage";
-import Watchlist from "./appPages/Watchlist";
-
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import SkeletonPlaceholder from "./pages/skeletons/SkeletonMain";
-import DetailSkeletonPlaceholder from "./pages/skeletons/SkeletonDetail";
-import "react-loading-skeleton/dist/skeleton.css";
-import { AnimatePresence, motion } from "motion/react";
+import { BrowserRouter } from "react-router-dom";
+import AnimatedRoutes from "./AnimatedRoutes";
 
 function App() {
   const [coins, setCoins] = useState(null);
@@ -38,6 +30,7 @@ function App() {
   });
   const [detailError, setDetailError] = useState(null);
   const [chartError, setChartError] = useState(null);
+  const [searchCrypto, setSearchCrypto] = useState("");
 
   useEffect(() => {
     async function getData() {
@@ -117,6 +110,10 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem("backgroundColor", backgroundColor);
+    document.documentElement.classList.toggle(
+      "dark",
+      backgroundColor === "black",
+    );
   }, [backgroundColor]);
 
   useEffect(() => {
@@ -127,18 +124,10 @@ function App() {
     SetId(id);
   };
 
-  let background = {};
-  if (backgroundColor === "white") {
-    background = {
-      backgroundColor: "white",
-      color: "black",
-    };
-  } else {
-    background = {
-      backgroundColor: "black",
-      color: "white",
-    };
-  }
+  const filteredCryptos = (allCoins || []).filter((crypto) =>
+    crypto.name.toLowerCase().startsWith(searchCrypto.toLowerCase()),
+  );
+
   const handleAddtoWatchlist = (crypto) => {
     for (const item of watchlistData) {
       if (item.id === crypto.id) {
@@ -148,92 +137,31 @@ function App() {
     }
     setWatchlistData((prev) => [...prev, crypto]);
   };
-  function PageTransition({ children }) {
-    return (
-      <motion.main
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -50 }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
-      >
-        {children}
-      </motion.main>
-    );
-  }
 
-  function AnimatedRoutes() {
-    const location = useLocation();
-    return (
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path="/"
-            element={
-              <PageTransition>
-                {loading ? (
-                  <SkeletonPlaceholder />
-                ) : (
-                  <MainPage
-                    coins={coins}
-                    trendingCoins={trendingCoins?.coins}
-                    allCoins={allCoins}
-                    findId={findId}
-                    backgroundColor={backgroundColor}
-                    setBackgroundColor={setBackgroundColor}
-                  />
-                )}
-              </PageTransition>
-            }
-          />
-          <Route
-            path="/DetailPage/:id"
-            element={
-              <PageTransition>
-                {detailLoading ? (
-                  <DetailSkeletonPlaceholder />
-                ) : (
-                  <DetailPage
-                    specificCoin={specificCoin}
-                    backgroundColor={backgroundColor}
-                    setBackgroundColor={setBackgroundColor}
-                    chartData={chartData}
-                    daysForChart={daysForChart}
-                    setDaysForChart={setDaysForChart}
-                    watchlistData={watchlistData}
-                    setWatchlistData={setWatchlistData}
-                    handleAddtoWatchlist={handleAddtoWatchlist}
-                    allCoins={allCoins}
-                    findId={findId}
-                    chartError={chartError}
-                    detailError={detailError}
-                  />
-                )}
-              </PageTransition>
-            }
-          />
-          <Route
-            path="/Watchlist"
-            element={
-              <PageTransition>
-                <Watchlist
-                  watchlistData={watchlistData}
-                  findId={findId}
-                  allCoins={allCoins}
-                  backgroundColor={backgroundColor}
-                  setBackgroundColor={setBackgroundColor}
-                  setWatchlistData={setWatchlistData}
-                />
-              </PageTransition>
-            }
-          />
-        </Routes>
-      </AnimatePresence>
-    );
-  }
   return (
-    <div className="App" style={background}>
+    <div className="App min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
       <BrowserRouter>
-        <AnimatedRoutes />
+        <AnimatedRoutes
+          loading={loading}
+          coins={coins}
+          trendingCoins={trendingCoins?.coins}
+          detailLoading={detailLoading}
+          specificCoin={specificCoin}
+          chartData={chartData}
+          daysForChart={daysForChart}
+          setDaysForChart={setDaysForChart}
+          watchlistData={watchlistData}
+          setWatchlistData={setWatchlistData}
+          handleAddtoWatchlist={handleAddtoWatchlist}
+          chartError={chartError}
+          detailError={detailError}
+          findId={findId}
+          searchCrypto={searchCrypto}
+          setSearchCrypto={setSearchCrypto}
+          backgroundColor={backgroundColor}
+          setBackgroundColor={setBackgroundColor}
+          filteredCryptos={filteredCryptos}
+        />
       </BrowserRouter>
     </div>
   );

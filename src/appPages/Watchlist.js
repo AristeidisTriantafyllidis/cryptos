@@ -1,17 +1,8 @@
-import React, { useEffect, useState } from "react";
-import Header from "./Header";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import Watchlist from "./appPages/Watchlist";
-export default function Watchlist(props) {
-  const [allCryptos, setAllCryptos] = useState([]);
-  const [searchCrypto, setSearchCrypto] = useState("");
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (props.allCoins) {
-      setAllCryptos(props.allCoins);
-    }
-  }, [props.coins, props.trendingCoins, props.allCoins]);
+export default function Watchlist(props) {
+  const navigate = useNavigate();
 
   const handleClick = (crypto) => {
     const id = crypto.id || crypto.coin_id || crypto.item?.id;
@@ -19,9 +10,6 @@ export default function Watchlist(props) {
     navigate(`/DetailPage/${id}`);
   };
 
-  const filteredCryptos = allCryptos.filter((crypto) =>
-    crypto.name.toLowerCase().startsWith(searchCrypto.toLowerCase()),
-  );
   const deleteCryptoFromWatchlist = (e, cryptoId) => {
     e.stopPropagation();
     const updateWatchlist = props?.watchlistData?.filter(
@@ -30,53 +18,49 @@ export default function Watchlist(props) {
     props.setWatchlistData(updateWatchlist);
   };
 
-  let searchPage;
-
-  if (searchCrypto !== "") {
-    if (filteredCryptos.length > 0) {
-      searchPage = filteredCryptos.map((crypto) => {
-        return (
-          <div
-            key={crypto.id || crypto.name}
-            onClick={() => handleClick(crypto)}
-          >
-            <p>{crypto.name}</p>
-          </div>
-        );
-      });
-    } else {
-      searchPage = (
-        <div className="empty-state">
-          <p>No crypto found</p>
-        </div>
-      );
-    }
-  }
   let watchlistPage = props?.watchlistData.map((crypto) => {
     return (
-      <div key={crypto.id} onClick={() => handleClick(crypto)}>
-        <p>{crypto?.name}</p>
-        <img src={crypto.image} />
-        <p>Current price {crypto.price}</p>
-        <p> Daily percentagee: {crypto.percentage24h} %</p>
-        <button onClick={(e) => deleteCryptoFromWatchlist(e, crypto.id)}>
-          Delete from Watchlist
+      <div
+        key={crypto.id}
+        onClick={() => handleClick(crypto)}
+        className="relative flex cursor-pointer flex-col items-start gap-2 rounded-2xl border border-slate-200 bg-white p-4.5 shadow-sm transition hover:-translate-y-0.5 hover:border-accent hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-accent-dark"
+      >
+        <button
+          onClick={(e) => deleteCryptoFromWatchlist(e, crypto.id)}
+          aria-label={`Delete ${crypto?.name} from watchlist`}
+          className="absolute right-2.5 top-2.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-negative/10 hover:text-negative dark:text-slate-500 dark:hover:bg-negative-dark/10 dark:hover:text-negative-dark"
+        >
+          ✕
         </button>
+        <img className="h-8 w-8 rounded-full" src={crypto.image} alt="" />
+        <p className="m-0 font-semibold">{crypto?.name}</p>
+        <p className="m-0 text-sm text-slate-500 dark:text-slate-400">
+          Current price {crypto.price}
+        </p>
+        <p
+          className={
+            crypto.percentage24h > 0
+              ? "m-0 text-sm font-semibold text-positive dark:text-positive-dark"
+              : "m-0 text-sm font-semibold text-negative dark:text-negative-dark"
+          }
+        >
+          Daily percentagee: {crypto.percentage24h} %
+        </p>
       </div>
     );
   });
 
   return (
-    <div>
-      <Header
-        searchCrypto={searchCrypto}
-        setSearchCrypto={setSearchCrypto}
-        setBackgroundColor={props.setBackgroundColor}
-      />
-      <button style={{ marginTop: "20px" }} onClick={() => navigate("/")}>
-        Go to home page
+    <div className="mx-auto max-w-[1100px] px-4 pb-16 pt-8 sm:px-6">
+      <button
+        onClick={() => navigate("/")}
+        className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-accent hover:text-accent dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-accent-dark dark:hover:text-accent-dark"
+      >
+        <span aria-hidden="true">←</span> Go to home page
       </button>
-      {searchCrypto !== "" ? searchPage : watchlistPage}
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+        {watchlistPage}
+      </div>
     </div>
   );
 }

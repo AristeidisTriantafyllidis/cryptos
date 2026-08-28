@@ -1,20 +1,40 @@
 import React, { useEffect, useRef } from "react";
 import { createChart, AreaSeries } from "lightweight-charts";
 
-export const LineGraph = ({ priceArray }) => {
+const POSITIVE = {
+  line: "#16a34a",
+  top: "rgba(22, 163, 74, 0.28)",
+  bottom: "rgba(22, 163, 74, 0.02)",
+};
+
+const NEGATIVE = {
+  line: "#dc2626",
+  top: "rgba(220, 38, 38, 0.28)",
+  bottom: "rgba(220, 38, 38, 0.02)",
+};
+
+function getTrendColors(priceArray) {
+  const isUp = priceArray[priceArray.length - 1] >= priceArray[0];
+  return isUp ? POSITIVE : NEGATIVE;
+}
+
+export const LineGraph = ({ priceArray, width = 120, height = 40 }) => {
   const chartContainerRef = useRef(null);
 
   useEffect(() => {
     if (!chartContainerRef.current || !priceArray?.length) return;
 
+    const { line, top, bottom } = getTrendColors(priceArray);
+
     const chart = createChart(chartContainerRef.current, {
-      width: 600,
-      height: 400,
+      width,
+      height,
 
       layout: {
         background: {
           color: "transparent",
         },
+        attributionLogo: false,
       },
 
       grid: {
@@ -28,7 +48,7 @@ export const LineGraph = ({ priceArray }) => {
       },
 
       leftPriceScale: {
-        visible: true,
+        visible: false,
       },
 
       rightPriceScale: {
@@ -36,9 +56,7 @@ export const LineGraph = ({ priceArray }) => {
       },
 
       timeScale: {
-        visible: true,
-
-        tickMarkFormatter: () => "",
+        visible: false,
       },
 
       handleScroll: false,
@@ -46,7 +64,12 @@ export const LineGraph = ({ priceArray }) => {
     });
 
     const areaSeries = chart.addSeries(AreaSeries, {
-      priceScaleId: "left",
+      lineColor: line,
+      topColor: top,
+      bottomColor: bottom,
+      lineWidth: 2,
+      priceLineVisible: false,
+      lastValueVisible: false,
     });
 
     const startDate = new Date();
@@ -78,50 +101,14 @@ export const LineGraph = ({ priceArray }) => {
     return () => {
       chart.remove();
     };
-  }, [priceArray]);
-
-  const dates = [];
-
-  for (let i = 0; i < 7; i++) {
-    const date = new Date();
-
-    date.setHours(0, 0, 0, 0);
-    date.setDate(date.getDate() - (6 - i));
-
-    dates.push({
-      key: date.toISOString(),
-      label: `${date.getDate()}/${date.getMonth() + 1}`,
-    });
-  }
+  }, [priceArray, width, height]);
 
   return (
-    <div style={{ width: "600px" }}>
-      <div
-        ref={chartContainerRef}
-        style={{
-          width: "600px",
-          height: "400px",
-        }}
-      />
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-
-          width: "500px",
-          marginLeft: "80px",
-
-          paddingTop: "6px",
-
-          fontSize: "11px",
-        }}
-      >
-        {dates.map((date) => (
-          <span key={date.key}>{date.label}</span>
-        ))}
-      </div>
-    </div>
+    <div
+      ref={chartContainerRef}
+      style={{ width, height }}
+      aria-hidden="true"
+    />
   );
 };
 
@@ -133,9 +120,20 @@ export const LineGraphForDetailPage = ({ priceArray, days }) => {
       return;
     }
 
-    const chart = createChart(chartContainerRef.current, {
-      width: 600,
-      height: 400,
+    const container = chartContainerRef.current;
+    const { line, top, bottom } = getTrendColors(priceArray);
+
+    const chart = createChart(container, {
+      width: container.clientWidth,
+      height: 320,
+
+      layout: {
+        background: {
+          color: "transparent",
+        },
+        textColor: "#8a8f98",
+        attributionLogo: false,
+      },
 
       grid: {
         vertLines: {
@@ -148,6 +146,7 @@ export const LineGraphForDetailPage = ({ priceArray, days }) => {
 
       leftPriceScale: {
         visible: true,
+        borderVisible: false,
       },
 
       rightPriceScale: {
@@ -156,6 +155,7 @@ export const LineGraphForDetailPage = ({ priceArray, days }) => {
 
       timeScale: {
         visible: true,
+        borderVisible: false,
 
         tickMarkFormatter: (time) => {
           const date = new Date(time * 1000);
@@ -192,6 +192,10 @@ export const LineGraphForDetailPage = ({ priceArray, days }) => {
 
     const areaSeries = chart.addSeries(AreaSeries, {
       priceScaleId: "left",
+      lineColor: line,
+      topColor: top,
+      bottomColor: bottom,
+      lineWidth: 2,
     });
 
     const now = Date.now();
@@ -216,10 +220,16 @@ export const LineGraphForDetailPage = ({ priceArray, days }) => {
 
     chart.timeScale().fitContent();
 
+    const handleResize = () => {
+      chart.applyOptions({ width: container.clientWidth });
+    };
+    window.addEventListener("resize", handleResize);
+
     return () => {
+      window.removeEventListener("resize", handleResize);
       chart.remove();
     };
   }, [priceArray, days]);
 
-  return <div ref={chartContainerRef} />;
+  return <div ref={chartContainerRef} className="w-full" />;
 };

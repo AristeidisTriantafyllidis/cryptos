@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "./Header";
 import { useState, useEffect } from "react";
 import { LineGraph } from "../chrart/Chart";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +6,6 @@ import { useNavigate } from "react-router-dom";
 export default function MainPage(props) {
   const [top20Cryptos, setTop20Cryptos] = useState([]);
   const [trendingCryptos, setTrendingCoins] = useState([]);
-  const [allCryptos, setAllCryptos] = useState([]);
-  const [searchCrypto, setSearchCrypto] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,10 +15,7 @@ export default function MainPage(props) {
     if (props.trendingCoins) {
       setTrendingCoins(props.trendingCoins);
     }
-    if (props.allCoins) {
-      setAllCryptos(props.allCoins);
-    }
-  }, [props.coins, props.trendingCoins, props.allCoins]);
+  }, [props.coins, props.trendingCoins]);
 
   const handleClick = (crypto) => {
     const id = crypto.id || crypto.coin_id || crypto.item?.id;
@@ -50,14 +44,28 @@ export default function MainPage(props) {
     }
 
     return (
-      <div key={crypto.item.coin_id} onClick={() => handleClick(crypto.item)}>
-        <p>{crypto.item.name}</p>
-        <p>{percentageText}</p>
+      <div
+        key={crypto.item.coin_id}
+        onClick={() => handleClick(crypto.item)}
+        className="flex w-20 flex-shrink-0 flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-accent hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-accent-dark sm:w-24"
+      >
+        <p className="m-0 text-sm font-semibold">
+          {crypto.item.symbol?.toUpperCase()}
+        </p>
+        <p
+          className={
+            pricePercentageDaily > 0
+              ? "m-0 text-xs font-semibold text-positive dark:text-positive-dark"
+              : "m-0 text-xs font-semibold text-negative dark:text-negative-dark"
+          }
+        >
+          {percentageText}%
+        </p>
       </div>
     );
   });
 
-  let topCryptos = top20Cryptos.map((crypto) => {
+  let topCryptos = top20Cryptos.map((crypto, index) => {
     const pricePercentageDaily = Number(crypto?.price_change_percentage_24h);
     let percentageText = "";
     if (pricePercentageDaily > 0) {
@@ -68,65 +76,73 @@ export default function MainPage(props) {
     const cryptoPrices = crypto?.sparkline_in_7d.price;
     const formatCryptoPrice = formatPrice(crypto?.current_price);
     return (
-      <div key={crypto.id} onClick={() => handleClick(crypto)}>
-        <p>{crypto.name}</p>
-        <p>
-          <img alt="crypto logo " src={crypto.image} />
-        </p>
-        <p>Price : {formatCryptoPrice} </p>
-        <p>Daily percentage: {percentageText} %</p>
-        <div>
-          <LineGraph priceArray={cryptoPrices} />
-        </div>
-      </div>
+      <tr
+        key={crypto.id}
+        onClick={() => handleClick(crypto)}
+        className="cursor-pointer border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50 dark:border-slate-800/80 dark:hover:bg-slate-800/50"
+      >
+        <td className="w-8 px-4 py-3.5 text-sm text-slate-400 dark:text-slate-500 sm:px-5">
+          {index + 1}
+        </td>
+        <td className="px-4 py-3.5 sm:px-5">
+          <div className="flex items-center gap-2">
+            <img
+              className="h-4 w-4 rounded-full"
+              alt="crypto logo "
+              src={crypto.image}
+            />
+            <p className="m-0 font-semibold">{crypto.name}</p>
+          </div>
+        </td>
+        <td className="px-4 py-3.5 text-sm sm:px-5">{formatCryptoPrice} </td>
+        <td
+          className={
+            pricePercentageDaily > 0
+              ? "px-4 py-3.5 text-sm font-semibold text-positive dark:text-positive-dark sm:px-5"
+              : "px-4 py-3.5 text-sm font-semibold text-negative dark:text-negative-dark sm:px-5"
+          }
+        >
+          {percentageText} %
+        </td>
+        <td className="px-4 py-3.5 sm:px-5">
+          <LineGraph priceArray={cryptoPrices} width={160} height={56} />
+        </td>
+      </tr>
     );
   });
 
-  const filteredCryptos = allCryptos.filter((crypto) =>
-    crypto.name.toLowerCase().startsWith(searchCrypto.toLowerCase()),
-  );
-
-  let searchPage;
-
-  if (searchCrypto !== "") {
-    if (filteredCryptos.length > 0) {
-      searchPage = filteredCryptos.map((crypto) => {
-        return (
-          <div
-            key={crypto.id || crypto.name}
-            onClick={() => handleClick(crypto)}
-          >
-            <p>{crypto.name}</p>
-          </div>
-        );
-      });
-    } else {
-      searchPage = (
-        <div className="empty-state">
-          <p>No crypto found</p>
-        </div>
-      );
-    }
-  }
-
   return (
-    <div>
-      <Header
-        backgroundColor={props.backgroundColor}
-        setBackgroundColor={props.setBackgroundColor}
-        searchCrypto={searchCrypto}
-        setSearchCrypto={setSearchCrypto}
-      />
+    <div className="mx-auto max-w-[1100px] px-4 pb-16 pt-8 sm:px-6">
+      <p className="mb-4 text-base font-semibold">trending 🔥</p>
+      <div className="flex gap-3.5 overflow-x-auto pb-1.5">{trending}</div>
 
-      {searchCrypto === "" ? (
-        <div>
-          <p>trending 🔥</p>
-          {trending}
-          {topCryptos}
-        </div>
-      ) : (
-        searchPage
-      )}
+      <p className="mb-4 mt-10 text-base font-semibold">
+        Top Coins by Market Cap
+      </p>
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <table className="w-full min-w-[640px] border-collapse">
+          <thead>
+            <tr>
+              <th className="border-b border-slate-200 px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:px-5">
+                #
+              </th>
+              <th className="border-b border-slate-200 px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:px-5">
+                Coin
+              </th>
+              <th className="border-b border-slate-200 px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:px-5">
+                Price
+              </th>
+              <th className="border-b border-slate-200 px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:px-5">
+                24h %
+              </th>
+              <th className="border-b border-slate-200 px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:px-5">
+                7d Chart
+              </th>
+            </tr>
+          </thead>
+          <tbody>{topCryptos}</tbody>
+        </table>
+      </div>
     </div>
   );
 }
