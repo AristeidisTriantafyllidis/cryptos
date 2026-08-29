@@ -56,15 +56,15 @@ export default function Header({
         />
       </div>
 
-      <div className="ml-auto flex flex-shrink-0 items-center gap-1.5">
+      <div className="ml-auto flex flex-shrink-0 items-center gap-3">
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-transparent text-lg transition-colors hover:border-slate-200 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:hover:border-slate-700 dark:hover:bg-slate-800"
+          className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full border border-transparent px-4 text-sm font-semibold transition-colors hover:border-slate-200 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:hover:border-slate-700 dark:hover:bg-slate-800"
           onClick={() => navigate("/Watchlist")}
           aria-label="Go to watchlist"
           title="Watchlist"
         >
-          ⭐
+          Watchlist
         </button>
         <button
           type="button"

@@ -47,7 +47,7 @@ export default function MainPage(props) {
       <div
         key={crypto.item.coin_id}
         onClick={() => handleClick(crypto.item)}
-        className="flex w-20 flex-shrink-0 flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-accent hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-accent-dark sm:w-24"
+        className="flex w-24 flex-shrink-0 flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-accent hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-accent-dark sm:w-28"
       >
         <p className="m-0 text-sm font-semibold">
           {crypto.item.symbol?.toUpperCase()}
@@ -113,8 +113,13 @@ export default function MainPage(props) {
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 pb-16 pt-8 sm:px-6">
-      <p className="mb-4 text-base font-semibold">trending 🔥</p>
-      <div className="flex gap-3.5 overflow-x-auto pb-1.5">{trending}</div>
+      <p className="mb-4 text-base font-semibold">Trending 🔥</p>
+      <div className="relative">
+        <div className="flex gap-4 overflow-x-auto py-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent dark:[&::-webkit-scrollbar-thumb]:bg-slate-600">
+          {trending}
+        </div>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-slate-50 to-transparent dark:from-slate-950" />
+      </div>
 
       <p className="mb-4 mt-10 text-base font-semibold">
         Top Coins by Market Cap

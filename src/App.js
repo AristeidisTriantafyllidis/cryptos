@@ -10,6 +10,12 @@ import { useState, useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
 import AnimatedRoutes from "./AnimatedRoutes";
 
+const RETRY_DELAYS_SECONDS = [90, 100, 120];
+
+function isRateLimitError(error) {
+  return error.message === "Failed to fetch";
+}
+
 function App() {
   const [coins, setCoins] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +32,14 @@ function App() {
   const [allCoins, setAllCoins] = useState(null);
   const [watchlistData, setWatchlistData] = useState(() => {
     const savedWatchlist = localStorage.getItem("cryptoWatchlist");
-    return savedWatchlist ? JSON.parse(savedWatchlist) : [];
+    if (!savedWatchlist) return [];
+
+    try {
+      return JSON.parse(savedWatchlist);
+    } catch (error) {
+      console.error("Failed to parse saved watchlist:", error);
+      return [];
+    }
   });
   const [detailError, setDetailError] = useState(null);
   const [chartError, setChartError] = useState(null);
@@ -58,53 +71,141 @@ function App() {
 
   useEffect(() => {
     if (id !== null) {
-      async function getSpecificCrypto() {
+      const controller = new AbortController();
+      let cancelled = false;
+      let retryTimeoutId;
+      let countdownIntervalId;
+
+      async function getSpecificCrypto(attempt = 0) {
         setDetailLoading(true);
-        setSpecificCoin(null);
-        setChartData(null);
+        if (attempt === 0) {
+          setSpecificCoin(null);
+        }
         setDetailError(null);
 
         try {
-          const result = await fetchSpecificCrypto(id);
+          const result = await fetchSpecificCrypto(id, controller.signal);
+          if (cancelled) return;
           setSpecificCoin(result);
         } catch (error) {
-          if (error.message.includes("429")) {
-            setDetailError("Too many requests. Please try again in a moment.");
+          if (error.name === "AbortError" || cancelled) return;
+
+          if (
+            isRateLimitError(error) &&
+            attempt < RETRY_DELAYS_SECONDS.length
+          ) {
+            let secondsLeft = RETRY_DELAYS_SECONDS[attempt];
+            setDetailError(
+              `You've reached CoinGecko's rate limit. Retrying in ${secondsLeft}s...`,
+            );
+
+            countdownIntervalId = setInterval(() => {
+              secondsLeft -= 1;
+              if (cancelled) return;
+              if (secondsLeft > 0) {
+                setDetailError(
+                  `You've reached CoinGecko's rate limit. Retrying in ${secondsLeft}s...`,
+                );
+              } else {
+                clearInterval(countdownIntervalId);
+              }
+            }, 1000);
+
+            retryTimeoutId = setTimeout(() => {
+              clearInterval(countdownIntervalId);
+              if (!cancelled) getSpecificCrypto(attempt + 1);
+            }, RETRY_DELAYS_SECONDS[attempt] * 1000);
+          } else if (isRateLimitError(error)) {
+            setDetailError(
+              "You've reached CoinGecko's rate limit. Please wait a minute and try again.",
+            );
           } else {
-            setError(() => {
-              throw error;
-            });
+            setDetailError("Unable to load cryptocurrency data.");
           }
         } finally {
-          setDetailLoading(false);
+          if (!cancelled) {
+            setDetailLoading(false);
+          }
         }
       }
 
       getSpecificCrypto();
+
+      return () => {
+        cancelled = true;
+        controller.abort();
+        clearTimeout(retryTimeoutId);
+        clearInterval(countdownIntervalId);
+      };
     }
   }, [id]);
 
   useEffect(() => {
     if (id !== null) {
-      setChartData(null);
-      setChartError(null);
+      const controller = new AbortController();
+      let cancelled = false;
+      let retryTimeoutId;
+      let countdownIntervalId;
 
-      async function getChartData() {
+      setChartData(null);
+
+      async function getChartData(attempt = 0) {
+        setChartError(null);
+
         try {
-          const result = await fetchDataForCHart(id, daysForChart);
+          const result = await fetchDataForCHart(
+            id,
+            daysForChart,
+            controller.signal,
+          );
+          if (cancelled) return;
           setChartData(result);
         } catch (error) {
-          if (error.message.includes("429")) {
-            setChartError("Too many requests. Please try again in a moment.");
+          if (error.name === "AbortError" || cancelled) return;
+
+          if (
+            isRateLimitError(error) &&
+            attempt < RETRY_DELAYS_SECONDS.length
+          ) {
+            let secondsLeft = RETRY_DELAYS_SECONDS[attempt];
+            setChartError(
+              `You've reached CoinGecko's rate limit. Retrying in ${secondsLeft}s...`,
+            );
+
+            countdownIntervalId = setInterval(() => {
+              secondsLeft -= 1;
+              if (cancelled) return;
+              if (secondsLeft > 0) {
+                setChartError(
+                  `You've reached CoinGecko's rate limit. Retrying in ${secondsLeft}s...`,
+                );
+              } else {
+                clearInterval(countdownIntervalId);
+              }
+            }, 1000);
+
+            retryTimeoutId = setTimeout(() => {
+              clearInterval(countdownIntervalId);
+              if (!cancelled) getChartData(attempt + 1);
+            }, RETRY_DELAYS_SECONDS[attempt] * 1000);
+          } else if (isRateLimitError(error)) {
+            setChartError(
+              "You've reached CoinGecko's rate limit. Please wait a minute and try again.",
+            );
           } else {
-            setError(() => {
-              throw error;
-            });
+            setChartError("Unable to load chart data.");
           }
         }
       }
 
       getChartData();
+
+      return () => {
+        cancelled = true;
+        controller.abort();
+        clearTimeout(retryTimeoutId);
+        clearInterval(countdownIntervalId);
+      };
     }
   }, [id, daysForChart]);
 

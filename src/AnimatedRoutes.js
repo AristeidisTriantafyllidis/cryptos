@@ -1,5 +1,11 @@
-import React from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import {
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import MainPage from "./appPages/MainPage";
 import DetailPage from "./appPages/DetailPage";
@@ -19,6 +25,49 @@ export function PageTransition({ children }) {
     >
       {children}
     </motion.main>
+  );
+}
+
+function DetailRoute({
+  findId,
+  detailLoading,
+  specificCoin,
+  chartData,
+  daysForChart,
+  setDaysForChart,
+  watchlistData,
+  setWatchlistData,
+  handleAddtoWatchlist,
+  chartError,
+  detailError,
+}) {
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      findId(id);
+    }
+  }, [id, findId]);
+
+  return (
+    <PageTransition>
+      {detailLoading ? (
+        <DetailSkeletonPlaceholder />
+      ) : (
+        <DetailPage
+          specificCoin={specificCoin}
+          chartData={chartData}
+          daysForChart={daysForChart}
+          setDaysForChart={setDaysForChart}
+          watchlistData={watchlistData}
+          setWatchlistData={setWatchlistData}
+          handleAddtoWatchlist={handleAddtoWatchlist}
+          findId={findId}
+          chartError={chartError}
+          detailError={detailError}
+        />
+      )}
+    </PageTransition>
   );
 }
 
@@ -110,24 +159,19 @@ export default function AnimatedRoutes({
             <Route
               path="/DetailPage/:id"
               element={
-                <PageTransition>
-                  {detailLoading ? (
-                    <DetailSkeletonPlaceholder />
-                  ) : (
-                    <DetailPage
-                      specificCoin={specificCoin}
-                      chartData={chartData}
-                      daysForChart={daysForChart}
-                      setDaysForChart={setDaysForChart}
-                      watchlistData={watchlistData}
-                      setWatchlistData={setWatchlistData}
-                      handleAddtoWatchlist={handleAddtoWatchlist}
-                      findId={findId}
-                      chartError={chartError}
-                      detailError={detailError}
-                    />
-                  )}
-                </PageTransition>
+                <DetailRoute
+                  findId={findId}
+                  detailLoading={detailLoading}
+                  specificCoin={specificCoin}
+                  chartData={chartData}
+                  daysForChart={daysForChart}
+                  setDaysForChart={setDaysForChart}
+                  watchlistData={watchlistData}
+                  setWatchlistData={setWatchlistData}
+                  handleAddtoWatchlist={handleAddtoWatchlist}
+                  chartError={chartError}
+                  detailError={detailError}
+                />
               }
             />
             <Route

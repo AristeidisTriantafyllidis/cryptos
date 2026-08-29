@@ -35,7 +35,7 @@ export default function Watchlist(props) {
         <img className="h-8 w-8 rounded-full" src={crypto.image} alt="" />
         <p className="m-0 font-semibold">{crypto?.name}</p>
         <p className="m-0 text-sm text-slate-500 dark:text-slate-400">
-          Current price {crypto.price}
+          Current price {crypto.price} $
         </p>
         <p
           className={
@@ -44,7 +44,7 @@ export default function Watchlist(props) {
               : "m-0 text-sm font-semibold text-negative dark:text-negative-dark"
           }
         >
-          Daily percentagee: {crypto.percentage24h} %
+          Daily percentage: {crypto.percentage24h} %
         </p>
       </div>
     );

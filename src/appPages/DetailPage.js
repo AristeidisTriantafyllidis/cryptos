@@ -115,7 +115,7 @@ export default function DetailPage(props) {
 
           <div className="mt-6">
             <button
-              className="rounded-xl bg-accent px-4.5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-accent-hover dark:bg-accent-dark dark:hover:bg-accent-darkhover"
+              className="rounded-xl bg-accent px-6 py-3 text-sm font-semibold tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-accent-hover dark:bg-accent-dark dark:hover:bg-accent-darkhover"
               onClick={() => {
                 if (coin) {
                   props.handleAddtoWatchlist({
