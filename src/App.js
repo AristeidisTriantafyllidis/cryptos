@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from "react";
 import { BrowserRouter } from "react-router-dom";
 import AnimatedRoutes from "./AnimatedRoutes";
 
-const RETRY_DELAYS_SECONDS = [90, 100, 120];
+const RETRY_DELAYS_SECONDS = [30, 60, 90];
 
 function isRateLimitError(error) {
   return error.status === 429;
@@ -249,6 +249,7 @@ function App() {
       }
     }
     setWatchlistData((prev) => [...prev, crypto]);
+    alert("You successfully added this coin to your watchlist!");
   };
 
   return (
