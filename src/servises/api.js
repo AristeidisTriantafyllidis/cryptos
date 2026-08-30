@@ -1,63 +1,57 @@
-export async function fetchData() {
+export async function fetchData(signal) {
   const response = await fetch(
-    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=true&price_change_percentage=1h,24h,7d",
-    {
-      headers: {
-        "x-cg-demo-api-key": "CG-4BmZ36BqvWyusNZayyXcVQHL",
-      },
-    },
+    "/api/coingecko/markets",
+    { signal },
   );
 
   if (!response.ok) {
-    throw new Error(`Response status : ${response.status}`);
+    const error = new Error(`Response status : ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   return response.json();
 }
 
-export async function fetchTrendingCryptos() {
-  const url = "https://api.coingecko.com/api/v3/search/trending";
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { "x-cg-demo-api-key": "CG-4BmZ36BqvWyusNZayyXcVQHL" },
-  });
+export async function fetchTrendingCryptos(signal) {
+  const url = "/api/coingecko/trending";
+  const response = await fetch(url, { method: "GET", signal });
   if (!response.ok) {
-    throw new Error(`Response Status : ${response.status} `);
+    const error = new Error(`Response Status : ${response.status} `);
+    error.status = response.status;
+    throw error;
   }
   return response.json();
 }
 
-export async function fetchSpecificCrypto(id) {
-  const url = `https://api.coingecko.com/api/v3/coins/${id}`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { "x-cg-demo-api-key": "CG-4BmZ36BqvWyusNZayyXcVQHL" },
-  });
+export async function fetchSpecificCrypto(id, signal) {
+  const url = `/api/coingecko/coin/${id}`;
+  const response = await fetch(url, { method: "GET", signal });
   if (!response.ok) {
-    throw new Error(`Response Status : ${response.status}`);
+    const error = new Error(`Response Status : ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   return response.json();
 }
 
-export async function fetchDataForCHart(id, days) {
-  const url = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { "x-cg-demo-api-key": "CG-4BmZ36BqvWyusNZayyXcVQHL" },
-  });
+export async function fetchDataForCHart(id, days, signal) {
+  const url = `/api/coingecko/chart/${id}?days=${days}`;
+  const response = await fetch(url, { method: "GET", signal });
   if (!response.ok) {
-    throw new Error(`Resonse stastus ${response.status}`);
+    const error = new Error(`Resonse stastus ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   return response.json();
 }
 
-export async function fetchEveryCoin() {
-  const url = "https://api.coingecko.com/api/v3/coins/list";
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { "x-cg-demo-api-key": "CG-4BmZ36BqvWyusNZayyXcVQHL" },
-  });
+export async function fetchEveryCoin(signal) {
+  const url = "/api/coingecko/coins-list";
+  const response = await fetch(url, { method: "GET", signal });
   if (!response.ok) {
-    throw new Error(`Response status ${response.status}`);
+    const error = new Error(`Response status ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   return response.json();
 }

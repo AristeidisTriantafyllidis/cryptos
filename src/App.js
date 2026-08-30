@@ -6,14 +6,14 @@ import {
   fetchDataForCHart,
   fetchEveryCoin,
 } from "./servises/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BrowserRouter } from "react-router-dom";
 import AnimatedRoutes from "./AnimatedRoutes";
 
 const RETRY_DELAYS_SECONDS = [90, 100, 120];
 
 function isRateLimitError(error) {
-  return error.message === "Failed to fetch";
+  return error.status === 429;
 }
 
 function App() {
@@ -46,27 +46,39 @@ function App() {
   const [searchCrypto, setSearchCrypto] = useState("");
 
   useEffect(() => {
+    const controller = new AbortController();
+    let cancelled = false;
+
     async function getData() {
       try {
         const [coins, trending, allCoins] = await Promise.all([
-          fetchData(),
-          fetchTrendingCryptos(),
-          fetchEveryCoin(),
+          fetchData(controller.signal),
+          fetchTrendingCryptos(controller.signal),
+          fetchEveryCoin(controller.signal),
         ]);
 
+        if (cancelled) return;
         setCoins(coins);
         setTrendingCoins(trending);
         setAllCoins(allCoins);
       } catch (error) {
+        if (error.name === "AbortError" || cancelled) return;
         setError(() => {
           throw error;
         });
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     getData();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, []);
 
   useEffect(() => {
@@ -221,9 +233,9 @@ function App() {
     localStorage.setItem("cryptoWatchlist", JSON.stringify(watchlistData));
   }, [watchlistData]);
 
-  const findId = (id) => {
+  const findId = useCallback((id) => {
     SetId(id);
-  };
+  }, []);
 
   const filteredCryptos = (allCoins || []).filter((crypto) =>
     crypto.name.toLowerCase().startsWith(searchCrypto.toLowerCase()),
