@@ -234,7 +234,10 @@ export default function DetailPage(props) {
           </div>
 
           <div className="mt-8">
-            <h2 className="mb-3 text-base font-semibold"> About {coin?.name}</h2>
+            <h2 className="mb-3 text-base font-semibold">
+              {" "}
+              About {coin?.name}
+            </h2>
             <p className="leading-relaxed text-slate-500 dark:text-slate-400">
               {coin?.description?.en
                 ? coin.description.en

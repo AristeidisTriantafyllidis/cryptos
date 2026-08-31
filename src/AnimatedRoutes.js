@@ -151,7 +151,11 @@ export default function AnimatedRoutes({
                   {loading ? (
                     <SkeletonPlaceholder />
                   ) : (
-                    <MainPage coins={coins} trendingCoins={trendingCoins} findId={findId} />
+                    <MainPage
+                      coins={coins}
+                      trendingCoins={trendingCoins}
+                      findId={findId}
+                    />
                   )}
                 </PageTransition>
               }

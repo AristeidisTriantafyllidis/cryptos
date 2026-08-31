@@ -104,11 +104,7 @@ export const LineGraph = ({ priceArray, width = 120, height = 40 }) => {
   }, [priceArray, width, height]);
 
   return (
-    <div
-      ref={chartContainerRef}
-      style={{ width, height }}
-      aria-hidden="true"
-    />
+    <div ref={chartContainerRef} style={{ width, height }} aria-hidden="true" />
   );
 };
 
